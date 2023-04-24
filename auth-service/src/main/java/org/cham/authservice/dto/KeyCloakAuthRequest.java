@@ -2,10 +2,11 @@ package org.cham.authservice.dto;
 
 import lombok.*;
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 @ToString
 public class KeyCloakAuthRequest {
     private String grant_type;

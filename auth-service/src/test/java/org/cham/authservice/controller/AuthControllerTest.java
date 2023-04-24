@@ -66,7 +66,7 @@ public class AuthControllerTest {
     @Test
     @DisplayName("Login Fail Test On Invalid Password")
     void login_fail_test() {
-        LoginRequest loginRequest = LoginRequest.builder().password("1qaz2wsx@").username("jdoe").build();
+        LoginRequest loginRequest = LoginRequest.builder().password("1qaz2wsx@1").username("jdoe").build();
         LoginResponse loginResponse = authController.login(loginRequest);
         assertThat(loginResponse.getCode() == 401);
         assertThat(loginResponse.getAccessToken() == null);

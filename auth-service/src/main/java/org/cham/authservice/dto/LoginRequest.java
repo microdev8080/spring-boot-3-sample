@@ -2,9 +2,10 @@ package org.cham.authservice.dto;
 
 import lombok.*;
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Builder
 @ToString
 public class LoginRequest {

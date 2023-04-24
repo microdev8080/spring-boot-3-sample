@@ -15,7 +15,7 @@ app:
       logout-url: http://localhost:28080/auth/realms/micro-dev/protocol/openid-connect/logout
       realm: micro-dev
       client-id: micro-dev-client
-      client-secret: 67b306ee-ea01-4d93-b4e0-f94675760246
+      client-secret: Zg2QXXWliYwiCQTPPDDYImHYkRbNdlEf
 
 eureka:
   client:
