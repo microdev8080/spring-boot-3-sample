@@ -27,3 +27,21 @@ services:
       - 6379:6379
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+
+  keycloak:
+    container_name: local_keycloak
+    environment:
+       KEYCLOAK_USER: admin
+       KEYCLOAK_PASSWORD: admin
+       KEYCLOAK_IMPORT: /tmp/realm-export.json
+    volumes:
+      - ./realm-export.json:/tmp/realm-export.json
+    image: jboss/keycloak:16.1.1
+    ports:
+      - "28080:8080"
+    restart: unless-stopped
+    networks:
+      - local-keycloak
+
+networks:
+  local-keycloak:

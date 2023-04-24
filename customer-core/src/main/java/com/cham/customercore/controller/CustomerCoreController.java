@@ -18,7 +18,7 @@ public class CustomerCoreController {
     @PostMapping("/api/customer-core")
     @ResponseStatus(HttpStatus.OK)
     public String createCustomer(@RequestBody CustomerCore customerCore) {
-        log.info("Inside CustomerCoreController.createCustomer()", customerCore.toString());
+        log.info("Inside CustomerCoreController.createCustomer() {}", customerCore.toString());
         String customerId = customerCoreService.saveCustomer(customerCore);
         return customerId;
     }
@@ -39,14 +39,14 @@ public class CustomerCoreController {
     @GetMapping("/api/customer-core/ssn")
     @ResponseStatus(HttpStatus.OK)
     public Optional<CustomerCore> findCustomerBySsn(@RequestParam(required = true) String ssn){
-        log.info("Inside CustomerCoreController.findCustomerBySsn()",ssn);
+        log.info("Inside CustomerCoreController.findCustomerBySsn() {}",ssn);
         return customerCoreService.findCustomerBySsn(ssn);
     }
 
     @GetMapping("/api/customer-core/first-name")
     @ResponseStatus(HttpStatus.OK)
     public Optional<CustomerCore> findCustomerByFirstName(@RequestParam(required = true) String firstName){
-        log.info("Inside CustomerCoreController.findCustomerByFirstName()",firstName);
+        log.info("Inside CustomerCoreController.findCustomerByFirstName() {}",firstName);
         return customerCoreService.findCustomerByFirstName(firstName);
     }
 }
