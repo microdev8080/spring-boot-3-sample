@@ -1,5 +1,57 @@
 version: '3.8'
 services:
+  api-gateway:
+    image: api-gateway:0.0.1-SNAPSHOT
+    depends_on:
+      - eureka-server
+    ports:
+      - 9099:9099
+    networks:
+      - banco
+
+  auth-service:
+    image: auth-service:0.0.1-SNAPSHOT
+    depends_on:
+      - eureka-server
+    ports:
+      - 9095:9095
+    networks:
+      - banco
+
+  customer-core:
+    image: customer-core:0.0.1-SNAPSHOT
+    depends_on:
+      - eureka-server
+    ports:
+      - 8083:8083
+    networks:
+      - banco
+
+  customer-service:
+    image: customer-service:0.0.1-SNAPSHOT
+    depends_on:
+      - eureka-server
+    ports:
+      - 8082:8082
+    networks:
+      - banco
+
+  cloud-config-server:
+    image: cloud-config-server:0.0.1-SNAPSHOT
+    ports:
+      - 8888:8888
+    networks:
+        - banco
+
+  eureka-server:
+    image: eureka-server:0.0.1-SNAPSHOT
+    depends_on:
+      - cloud-config-server
+    ports:
+      - 8761:8761
+    networks:
+        - banco
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -7,6 +59,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:2181
+    networks:
+      - banco
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -21,12 +75,17 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - banco
+
   redis:
     image: 'redis:latest'
     ports:
       - 6379:6379
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - banco
 
   keycloak:
     container_name: local_keycloak
@@ -41,7 +100,18 @@ services:
       - "28080:8080"
     restart: unless-stopped
     networks:
-      - local-keycloak
+      - banco
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - banco
 
 networks:
-  local-keycloak:
+  banco:
+    name: banco
