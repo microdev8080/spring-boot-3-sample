@@ -2,6 +2,7 @@ version: '3.8'
 services:
   api-gateway:
     image: api-gateway:0.0.1-SNAPSHOT
+    restart: always
     depends_on:
       - eureka-server
     ports:
@@ -11,6 +12,7 @@ services:
 
   auth-service:
     image: auth-service:0.0.1-SNAPSHOT
+    restart: always
     depends_on:
       - eureka-server
     ports:
@@ -20,6 +22,7 @@ services:
 
   customer-core:
     image: customer-core:0.0.1-SNAPSHOT
+    restart: always
     depends_on:
       - eureka-server
     ports:
@@ -29,6 +32,7 @@ services:
 
   customer-service:
     image: customer-service:0.0.1-SNAPSHOT
+    restart: always
     depends_on:
       - eureka-server
     ports:
@@ -45,6 +49,7 @@ services:
 
   eureka-server:
     image: eureka-server:0.0.1-SNAPSHOT
+    restart: always
     depends_on:
       - cloud-config-server
     ports:

@@ -9,12 +9,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 import java.util.Arrays;
 
 @SpringBootApplication
 @Slf4j
 @EnableDiscoveryClient
+@EnableRedisRepositories
 public class CustomerCoreApplication implements CommandLineRunner {
 
 	@Autowired

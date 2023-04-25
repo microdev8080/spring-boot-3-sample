@@ -1,8 +1,10 @@
 package com.cham.customercore.redis;
 
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
-@Configuration
+
+@TestConfiguration
 public class RedisProperties {
     private final int redisPort;
     private final String redisHost;
