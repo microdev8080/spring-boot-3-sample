@@ -6,7 +6,7 @@ services:
     depends_on:
       - eureka-server
     ports:
-      - 9099:9099
+      - '9099:9099'
     networks:
       - banco
 
@@ -16,7 +16,7 @@ services:
     depends_on:
       - eureka-server
     ports:
-      - 9095:9095
+      - '9095:9095'
     networks:
       - banco
 
@@ -26,7 +26,7 @@ services:
     depends_on:
       - eureka-server
     ports:
-      - 8083:8083
+      - '8083:8083'
     networks:
       - banco
 
@@ -36,14 +36,24 @@ services:
     depends_on:
       - eureka-server
     ports:
-      - 8082:8082
+      - '8082:8082'
+    networks:
+      - banco
+
+  auditor:
+    image: auditor:0.0.1-SNAPSHOT
+    restart: always
+    depends_on:
+      - eureka-server
+    ports:
+      - '9097:9097'
     networks:
       - banco
 
   cloud-config-server:
     image: cloud-config-server:0.0.1-SNAPSHOT
     ports:
-      - 8888:8888
+      - '8888:8888'
     networks:
         - banco
 
@@ -53,7 +63,7 @@ services:
     depends_on:
       - cloud-config-server
     ports:
-      - 8761:8761
+      - '8761:8761'
     networks:
         - banco
 
@@ -63,7 +73,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 22181:2181
+      - '22181:2181'
     networks:
       - banco
 
@@ -72,7 +82,7 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - '29092:29092'
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -86,7 +96,7 @@ services:
   redis:
     image: 'redis:latest'
     ports:
-      - 6379:6379
+      - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     networks:
@@ -95,6 +105,7 @@ services:
   keycloak:
     container_name: local_keycloak
     environment:
+       DB_VENDOR: h2
        KEYCLOAK_USER: admin
        KEYCLOAK_PASSWORD: admin
        KEYCLOAK_IMPORT: /tmp/realm-export.json
@@ -103,17 +114,17 @@ services:
     image: jboss/keycloak:16.1.1
     ports:
       - "28080:8080"
-    restart: unless-stopped
     networks:
       - banco
 
   postgres:
-    image: postgres
-    restart: always
+    image: "postgres:latest"
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_DB=postgres_database
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     networks:
       - banco
 
