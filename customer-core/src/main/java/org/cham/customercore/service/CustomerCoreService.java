@@ -13,8 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -95,11 +98,13 @@ public class CustomerCoreService {
             throw  new RuntimeException("Exception while accessing Redis",e);
         }
 
+        String now = LocalDateTime.now().toString();
         Audit auditMessage = Audit
                 .builder()
-                .id(10L)
+                .id(new Random().nextLong())
                 .auditEvent("CUSTOMER CREATED")
                 .auditEventPayload(returnedCustomer.toString())
+                .auditEventDate(now)
                 .build();
         auditMessageProducer.send(topic, gson.toJson(auditMessage));
 
