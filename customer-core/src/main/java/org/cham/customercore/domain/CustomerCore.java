@@ -14,5 +14,6 @@ public class CustomerCore {
     private @Indexed String ssn;
     private @Indexed String firstName;
     private @Indexed String lastName;
+    private @Indexed String userName;
     private @Indexed String accountNumber;
 }

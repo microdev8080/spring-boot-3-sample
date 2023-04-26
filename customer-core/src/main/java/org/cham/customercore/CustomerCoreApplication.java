@@ -28,6 +28,7 @@ public class CustomerCoreApplication implements CommandLineRunner {
 			.accountNumber("9876534")
 			.firstName("Rob")
 			.lastName("Atkins")
+			.userName("jatkins")
 			.build();
 	CustomerCore tony = CustomerCore
 			.builder()
@@ -36,6 +37,17 @@ public class CustomerCoreApplication implements CommandLineRunner {
 			.accountNumber("67654387")
 			.firstName("Tony")
 			.lastName("Stark")
+			.userName("tstark")
+			.build();
+
+	CustomerCore john = CustomerCore
+			.builder()
+			.id("john12345")
+			.ssn("ssn-98747885")
+			.accountNumber("6743213878")
+			.firstName("John")
+			.lastName("Doe")
+			.userName("jdoe")
 			.build();
 
 	public static void main(String[] args) {
@@ -45,6 +57,6 @@ public class CustomerCoreApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		log.info("Inside the run method of the main class - CustomerCoreApplication");
-		customerCoreRepository.saveAll(Arrays.asList(rob,tony));
+		customerCoreRepository.saveAll(Arrays.asList(rob,tony,john));
 	}
 }

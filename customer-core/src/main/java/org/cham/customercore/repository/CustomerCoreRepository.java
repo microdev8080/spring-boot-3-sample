@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface CustomerCoreRepository extends CrudRepository<CustomerCore, String> {
     Optional<CustomerCore> findById();
     Optional<CustomerCore> findByFirstName(String firstName);
+    Optional<CustomerCore> findByUserName(String userName);
     Optional<CustomerCore> findBySsn(String ssn);
 
     List<CustomerCore> findAll();

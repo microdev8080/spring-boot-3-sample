@@ -43,6 +43,17 @@ public class CustomerCoreService {
         return customer;
     }
 
+    public Optional<CustomerCore> findCustomerByUserName(String username){
+        Optional<CustomerCore> customer;
+        try {
+            customer = customerCoreRepository.findByUserName(username);
+        }catch(DataAccessException e){
+            log.error("Exception while accessing Redis", e);
+            throw  new RuntimeException("Exception while accessing Redis",e);
+        }
+        return customer;
+    }
+
     public Optional<CustomerCore> findCustomerByFirstName(String firstName){
         Optional<CustomerCore> customer;
         try {

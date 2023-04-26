@@ -49,4 +49,13 @@ public class CustomerCoreController {
         log.info("Inside CustomerCoreController.findCustomerByFirstName() {}",firstName);
         return customerCoreService.findCustomerByFirstName(firstName);
     }
+
+    @GetMapping("/api/customer-core/username/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public Optional<CustomerCore> findCustomerByUserName(@PathVariable String username){
+        log.info("Inside CustomerCoreController.findCustomerById()");
+        return customerCoreService.findCustomerByUserName(username);
+    }
+
+
 }

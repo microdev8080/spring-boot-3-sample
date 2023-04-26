@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,16 @@ public class CustomerController {
         List<CustomerCore> customerList = customerCoreClient.findAllCustomers();
         customerList.stream().forEach(t -> log.info(t.toString()));
         return customerList;
+    }
+
+
+    @GetMapping("/api/customers/customer")
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerCore findCustomerFromCoreAPI(@RequestParam(required =true) String username){
+        log.info("Inside CustomerController.findCustomerFromCoreAPI()");
+        CustomerCore customer = customerCoreClient.findCustomerByUsername(username);
+       log.info("received customer {} for username {}",customer,username);
+        return customer;
     }
 
 }
