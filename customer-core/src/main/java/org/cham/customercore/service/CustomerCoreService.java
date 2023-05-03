@@ -50,6 +50,17 @@ public class CustomerCoreService {
         Optional<CustomerCore> customer;
         try {
             customer = customerCoreRepository.findByUserName(username);
+
+            String now = LocalDateTime.now().toString();
+            Audit auditMessage = Audit
+                    .builder()
+                    .id(new Random().nextLong())
+                    .auditEvent("CUSTOMER RETRIEVED")
+                    .auditEventPayload(customer.toString())
+                    .auditEventDate(now)
+                    .build();
+            auditMessageProducer.send(topic, gson.toJson(auditMessage));
+
         }catch(DataAccessException e){
             log.error("Exception while accessing Redis", e);
             throw  new RuntimeException("Exception while accessing Redis",e);
