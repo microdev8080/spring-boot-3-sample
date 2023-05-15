@@ -1,9 +1,9 @@
 package org.cham.authservice.service;
 
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.HttpStatus;
 import feign.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
 import org.cham.authservice.client.KeyCloakClient;
 import org.cham.authservice.dto.KeyCloakAuthRequest;
 import org.cham.authservice.dto.LoginRequest;

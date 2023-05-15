@@ -18,9 +18,9 @@ spec:
         app: cloud-config-server
     spec:
       containers:
-      - image: skobbekaduawa/microdev:cloud-config-server
-        name: cloud-config-server
-        resources: {}
+        - image: skobbekaduawa/microdev:cloud-config-server
+          name: cloud-config-server
+          resources: {}
 status: {}
 ---
 apiVersion: v1
@@ -32,10 +32,10 @@ metadata:
   name: cloud-config-server
 spec:
   ports:
-  - name: 8888-8888
-    port: 8888
-    protocol: TCP
-    targetPort: 8888
+    - name: 8888-8888
+      port: 8888
+      protocol: TCP
+      targetPort: 8888
   selector:
     app: cloud-config-server
   type: ClusterIP
@@ -65,6 +65,17 @@ spec:
         - image: skobbekaduawa/microdev:api-gateway
           name: api-gateway
           resources: {}
+          env:
+            - name: EUREKA_CLIENT_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_KUBERNETES_RELOAD_ENABLED
+              value: "true"
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              value: "org.springframework.cloud.netflix.eureka.loadbalancer.LoadBalancerEurekaAutoConfiguration"
+            - name: "logging.level.org.springframework.cloud.kubernetes"
+              value: "TRACE"
 status: {}
 ---
 apiVersion: v1
@@ -82,51 +93,7 @@ spec:
       targetPort: 9099
   selector:
     app: api-gateway
-  type: ClusterIP
-status:
-  loadBalancer: {}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  creationTimestamp: null
-  labels:
-    app: auditor
-  name: auditor
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: auditor
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: auditor
-    spec:
-      containers:
-        - image: skobbekaduawa/microdev:auditor
-          name: auditor
-          resources: {}
-status: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  creationTimestamp: null
-  labels:
-    app: auditor
-  name: auditor
-spec:
-  ports:
-    - name: 9099-9099
-      port: 9099
-      protocol: TCP
-      targetPort: 9099
-  selector:
-    app: auditor
-  type: ClusterIP
+  type: LoadBalancer
 status:
   loadBalancer: {}
 ---
@@ -197,6 +164,15 @@ spec:
         - image: skobbekaduawa/microdev:auth-service
           name: auth-service
           resources: {}
+          env:
+            - name: EUREKA_CLIENT_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_KUBERNETES_RELOAD_ENABLED
+              value: "true"
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              value: "org.springframework.cloud.netflix.eureka.loadbalancer.LoadBalancerEurekaAutoConfiguration"
 status: {}
 ---
 apiVersion: v1
@@ -311,50 +287,6 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: customer-service
-  name: customer-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: customer-service
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: customer-service
-    spec:
-      containers:
-        - image: skobbekaduawa/microdev:customer-service
-          name: customer-service
-          resources: {}
-status: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  creationTimestamp: null
-  labels:
-    app: customer-service
-  name: customer-service
-spec:
-  ports:
-    - name: 8082-8082
-      port: 8082
-      protocol: TCP
-      targetPort: 8082
-  selector:
-    app: customer-service
-  type: ClusterIP
-status:
-  loadBalancer: {}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  creationTimestamp: null
-  labels:
     app: zookeeper
   name: zookeeper
 spec:
@@ -375,9 +307,9 @@ spec:
           resources: {}
           env:
             - name: ZOOKEEPER_CLIENT_PORT
-              value: '2181'
+              value: "2181"
             - name: ZOOKEEPER_TICK_TIME
-              value: '2000'
+              value: "2000"
 status: {}
 ---
 apiVersion: v1
@@ -404,37 +336,37 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: kafka
-  name: kafka
+    app: kafka-server
+  name: kafka-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka
+      app: kafka-server
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: kafka
+        app: kafka-server
     spec:
       containers:
         - image: wurstmeister/kafka:latest
-          name: kafka
+          name: kafka-server
           ports:
             - containerPort: 9092
           resources: {}
           env:
             - name: KAFKA_ADVERTISED_HOST_NAME
-              value: 'kafka'
+              value: "kafka-server"
             - name: KAFKA_ZOOKEEPER_CONNECT
-              value: 'zookeeper:2181'
+              value: "zookeeper:2181"
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: 'PLAINTEXT://kafka:9092'
+              value: "PLAINTEXT://kafka-server.default.svc.cluster.local:9092"
             - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
-              value: 'true'
+              value: "true"
             - name: KAFKA_LISTENERS
-              value: 'PLAINTEXT://kafka:9092'
+              value: "PLAINTEXT://:9092"
 
 status: {}
 ---
@@ -443,16 +375,16 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: kafka-service
-  name: kafka-service
+    app: kafka-server
+  name: kafka-server
 spec:
   ports:
-    - name: 29092-29092
-      port: 29092
+    - name: 9092-9092
+      port: 9092
       protocol: TCP
-      targetPort: 29092
+      targetPort: 9092
   selector:
-    app: kafka
+    app: kafka-server
   type: ClusterIP
 status:
   loadBalancer: {}
@@ -482,7 +414,7 @@ spec:
           resources: {}
           env:
             - name: ALLOW_EMPTY_PASSWORD
-              value: 'yes'
+              value: "yes"
 status: {}
 ---
 apiVersion: v1
@@ -524,21 +456,16 @@ spec:
         app: keycloak
     spec:
       containers:
-        - image: local_keycloak
+        - image: jboss/keycloak:16.1.1
           name: keycloak
           resources: {}
           env:
             - name: DB_VENDOR
-              value: h1
+              value: h2
             - name: KEYCLOAK_USER
               value: admin
             - name: KEYCLOAK_PASSWORD
               value: admin
-            - name: KEYCLOAK_IMPORT
-              value: /tmp/realm-export.json
-          volumeMounts:
-            - name: json-import
-              mountPath: /tmp
       volumes:
         - name: json-import
           configMap:
@@ -557,10 +484,10 @@ metadata:
   name: keycloak
 spec:
   ports:
-    - name: 28080-8080
+    - name: 8080-8080
       port: 8080
       protocol: TCP
-      targetPort: 28080
+      targetPort: 8080
   selector:
     app: keycloak
   type: ClusterIP
@@ -592,11 +519,11 @@ spec:
           resources: {}
           env:
             - name: POSTGRES_DB
-              value: 'postgres_database'
+              value: "postgres_database"
             - name: POSTGRES_USER
-              value: 'postgres'
+              value: "postgres"
             - name: POSTGRES_PASSWORD
-              value: 'postgres'
+              value: "postgres"
 status: {}
 ---
 apiVersion: v1
@@ -617,3 +544,97 @@ spec:
   type: ClusterIP
 status:
   loadBalancer: {}
+---
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: spring-cloud-kubernetes-discoveryserver
+      name: spring-cloud-kubernetes-discoveryserver
+    spec:
+      ports:
+        - name: http
+          port: 80
+          targetPort: 8761
+      selector:
+        app: spring-cloud-kubernetes-discoveryserver
+      type: ClusterIP
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app: spring-cloud-kubernetes-discoveryserver
+      name: spring-cloud-kubernetes-discoveryserver
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app: spring-cloud-kubernetes-discoveryserver
+      name: spring-cloud-kubernetes-discoveryserver:view
+    roleRef:
+      kind: Role
+      apiGroup: rbac.authorization.k8s.io
+      name: namespace-reader
+    subjects:
+      - kind: ServiceAccount
+        name: spring-cloud-kubernetes-discoveryserver
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      namespace: default
+      name: namespace-reader
+    rules:
+      - apiGroups: ["", "extensions", "apps"]
+        resources: ["services", "endpoints"]
+        verbs: ["get", "list", "watch"]
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: spring-cloud-kubernetes-discoveryserver-deployment
+    spec:
+      selector:
+        matchLabels:
+          app: spring-cloud-kubernetes-discoveryserver
+      template:
+        metadata:
+          labels:
+            app: spring-cloud-kubernetes-discoveryserver
+        spec:
+          serviceAccount: spring-cloud-kubernetes-discoveryserver
+          containers:
+            - name: spring-cloud-kubernetes-discoveryserver
+              image: springcloud/spring-cloud-kubernetes-discoveryserver:2.1.0-M3
+              imagePullPolicy: IfNotPresent
+              readinessProbe:
+                httpGet:
+                  port: 8761
+                  path: /actuator/health/readiness
+              livenessProbe:
+                httpGet:
+                  port: 8761
+                  path: /actuator/health/liveness
+              ports:
+                - containerPort: 8761
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: api-gateway
+              servicePort: 9099
+#          - path: /
+#            backend:
+#              serviceName: contact-us-service
+#              servicePort: 8080

@@ -55,7 +55,7 @@ services:
     ports:
       - '8888:8888'
     networks:
-        - banco
+      - banco
 
   eureka-server:
     image: eureka-server:0.0.1-SNAPSHOT
@@ -65,7 +65,7 @@ services:
     ports:
       - '8761:8761'
     networks:
-        - banco
+      - banco
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -104,10 +104,10 @@ services:
   keycloak:
     container_name: local_keycloak
     environment:
-       DB_VENDOR: h2
-       KEYCLOAK_USER: admin
-       KEYCLOAK_PASSWORD: admin
-       KEYCLOAK_IMPORT: /tmp/realm-export.json
+      DB_VENDOR: h2
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /tmp/realm-export.json
     volumes:
       - ./realm-export.json:/tmp/realm-export.json
     image: jboss/keycloak:16.1.1

@@ -1,0 +1,283 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: cloud-config-server
+  name: cloud-config-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-config-server
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: cloud-config-server
+    spec:
+      containers:
+        - image: skobbekaduawa/microdev:cloud-config-server
+          name: cloud-config-server
+          resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: cloud-config-server
+  name: cloud-config-server
+spec:
+  ports:
+    - name: 8888-8888
+      port: 8888
+      protocol: TCP
+      targetPort: 8888
+  selector:
+    app: cloud-config-server
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: api-gateway
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - image: skobbekaduawa/microdev:api-gateway
+          name: api-gateway
+          resources: {}
+          env:
+            - name: EUREKA_CLIENT_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_KUBERNETES_RELOAD_ENABLED
+              value: "true"
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              value: "org.springframework.cloud.netflix.eureka.loadbalancer.LoadBalancerEurekaAutoConfiguration"
+            - name: "logging.level.org.springframework.cloud.kubernetes"
+              value: "TRACE"
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: api-gateway
+  name: api-gateway
+spec:
+  ports:
+    - name: 9099-9099
+      port: 9099
+      protocol: TCP
+      targetPort: 9099
+  selector:
+    app: api-gateway
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: auth-service
+  name: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: auth-service
+    spec:
+      containers:
+        - image: skobbekaduawa/microdev:auth-service
+          name: auth-service
+          resources: {}
+          env:
+            - name: EUREKA_CLIENT_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_KUBERNETES_RELOAD_ENABLED
+              value: "true"
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              value: "org.springframework.cloud.netflix.eureka.loadbalancer.LoadBalancerEurekaAutoConfiguration"
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: auth-service
+  name: auth-service
+spec:
+  ports:
+    - name: 9095-9095
+      port: 9095
+      protocol: TCP
+      targetPort: 9095
+  selector:
+    app: auth-service
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: spring-cloud-kubernetes-discoveryserver
+      name: spring-cloud-kubernetes-discoveryserver
+    spec:
+      ports:
+        - name: http
+          port: 80
+          targetPort: 8761
+      selector:
+        app: spring-cloud-kubernetes-discoveryserver
+      type: ClusterIP
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app: spring-cloud-kubernetes-discoveryserver
+      name: spring-cloud-kubernetes-discoveryserver
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app: spring-cloud-kubernetes-discoveryserver
+      name: spring-cloud-kubernetes-discoveryserver:view
+    roleRef:
+      kind: Role
+      apiGroup: rbac.authorization.k8s.io
+      name: namespace-reader
+    subjects:
+      - kind: ServiceAccount
+        name: spring-cloud-kubernetes-discoveryserver
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      namespace: default
+      name: namespace-reader
+    rules:
+      - apiGroups: ["", "extensions", "apps"]
+        resources: ["services", "endpoints"]
+        verbs: ["get", "list", "watch"]
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: spring-cloud-kubernetes-discoveryserver-deployment
+    spec:
+      selector:
+        matchLabels:
+          app: spring-cloud-kubernetes-discoveryserver
+      template:
+        metadata:
+          labels:
+            app: spring-cloud-kubernetes-discoveryserver
+        spec:
+          serviceAccount: spring-cloud-kubernetes-discoveryserver
+          containers:
+            - name: spring-cloud-kubernetes-discoveryserver
+              image: springcloud/spring-cloud-kubernetes-discoveryserver:2.1.0-M3
+              imagePullPolicy: IfNotPresent
+              readinessProbe:
+                httpGet:
+                  port: 8761
+                  path: /actuator/health/readiness
+              livenessProbe:
+                httpGet:
+                  port: 8761
+                  path: /actuator/health/liveness
+              ports:
+                - containerPort: 8761
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: keycloak
+  name: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - image: jboss/keycloak:16.1.1
+          name: keycloak
+          resources: {}
+          env:
+            - name: DB_VENDOR
+              value: h2
+            - name: KEYCLOAK_USER
+              value: admin
+            - name: KEYCLOAK_PASSWORD
+              value: admin
+      volumes:
+        - name: json-import
+          configMap:
+            name: keycloak
+            items:
+              - key: realm-export.json
+                path: realm-export.json
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: keycloak
+  name: keycloak
+spec:
+  ports:
+    - name: 8080-8080
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: keycloak
+  type: ClusterIP
+status:
+  loadBalancer: {}
