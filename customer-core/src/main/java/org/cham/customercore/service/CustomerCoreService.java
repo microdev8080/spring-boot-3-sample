@@ -1,5 +1,6 @@
 package org.cham.customercore.service;
 
+import io.micrometer.observation.annotation.Observed;
 import org.cham.customercore.domain.Audit;
 import org.cham.customercore.domain.CustomerCore;
 import org.cham.customercore.producer.AuditMessageProducer;
@@ -46,6 +47,9 @@ public class CustomerCoreService {
         return customer;
     }
 
+    @Observed(name = "customer.data",
+            contextualName = "getting-customer",
+            lowCardinalityKeyValues = {"userType", "Customer"})
     public Optional<CustomerCore> findCustomerByUserName(String username){
         Optional<CustomerCore> customer;
         try {
